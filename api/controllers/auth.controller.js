@@ -43,19 +43,52 @@ const signin = async(req, res, next)=>{
             return next(errorHandler(400, 'Invalid password'))
         }
 
-        const token = jwt.sign( {id: validUser._id}, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
 
-        const {password: pass, ...rest} = validUser._doc;
+        const { password: pass, ...rest } = validUser._doc;
         res
-        .status(200)
-        .cookie('acces_token', token, {
-            httpOnly:true
-        })
-        .json(rest);
-        }catch (error){
+            .status(200)
+            .cookie('access_token', token, {
+                httpOnly: true
+            })
+            .json(rest);
+    } catch (error) {
         next(error);
     }
-
 }
 
-module.exports = { signup, signin };
+const google = async(req, res, next) => {
+    const { email, name, googlePhotoUrl } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if(user){
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+            const { password, ...rest } = user._doc;
+            res.status(200).cookie('access_token', token, {
+                httpOnly: true,
+            }).json(rest);
+        } else {
+            const generatePassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashPassword = bcryptjs.hashSync(generatePassword, 10);
+            const newUser = new User({
+                username: name.toLowerCase().split(' ').join(' ') + Math.random().toString(9).slice(-4),
+                email,
+                password: hashPassword,
+                profilePicture: googlePhotoUrl,
+            });
+            await newUser.save();
+            const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+            const { password, ...rest } = newUser._doc;
+            res
+                .status(200)
+                .cookie('access_token', token, {
+                    httpOnly: true,
+                })
+                .json(rest)
+        }
+    } catch(error){
+        next(errorHandler(500, 'An error occurred during Google authentication'));
+    }
+}
+
+module.exports = { signup, signin, google };
