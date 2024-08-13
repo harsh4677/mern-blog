@@ -4,7 +4,7 @@ import OAuth from '../components/OAuth';
 function Signup({ setAuthState }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
-    const [confirmPassword, setConfirmPassword] = React.useState('');
+    const [username, setUsername] = React.useState('');
 
     const handleSignup = () => {
         // Add signup logic here if needed
@@ -19,18 +19,18 @@ function Signup({ setAuthState }) {
                     <p className='font-medium text-lg text-gray-500 mt-4'>Sign up to get started.</p>
                     <div className='mt-8'>
                         <div className='flex flex-col'>
-                            <label className='text-lg font-medium'>Email</label>
+                            <label className='text-lg font-medium'>Username</label>
                             <input 
-                                value={email}
+                                value={username}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
                                 placeholder="Email"
                             />
                         </div>
                         <div className='flex flex-col mt-4'>
-                            <label className='text-lg font-medium'>Password</label>
+                            <label className='text-lg font-medium'>Email</label>
                             <input 
-                                value={password}
+                                value={email}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
                                 placeholder="Password"
@@ -38,9 +38,9 @@ function Signup({ setAuthState }) {
                             />
                         </div>
                         <div className='flex flex-col mt-4'>
-                            <label className='text-lg font-medium'>Confirm Password</label>
+                            <label className='text-lg font-medium'>Password</label>
                             <input 
-                                value={confirmPassword}
+                                value={password}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
                                 placeholder="Confirm Password"

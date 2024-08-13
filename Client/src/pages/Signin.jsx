@@ -21,7 +21,7 @@ function Signin({ setAuthState }) {
             <div className="w-full flex items-center justify-center lg:w-1/2">
                 <div className='w-11/12 max-w-[700px] px-10 py-20 rounded-3xl bg-white border-2 border-gray-100'>
                     <h1 className='text-5xl font-semibold'>Create an Account</h1>
-                    <p className='font-medium text-lg text-gray-500 mt-4'>Sign up to get started.</p>
+                    <p className='font-medium text-lg text-gray-500 mt-4'>Sign In to get started.</p>
                     <div className='mt-8'>
                         <div className='flex flex-col'>
                             <label className='text-lg font-medium'>Email</label>
@@ -39,16 +39,6 @@ function Signin({ setAuthState }) {
                                 onChange={(e) => setPassword(e.target.value)}
                                 className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
                                 placeholder="Password"
-                                type="password"
-                            />
-                        </div>
-                        <div className='flex flex-col mt-4'>
-                            <label className='text-lg font-medium'>Confirm Password</label>
-                            <input 
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
-                                placeholder="Confirm Password"
                                 type="password"
                             />
                         </div>
