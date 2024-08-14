@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { deleteUser as deleteUserAPI } from '../../../../api/controllers/user.controller';
+import { deleteUser as deleteUserAPI } from '../../../../api/controllers/user.controller/deleteUser';
 
 const initialState = {
   currentUser: null,
