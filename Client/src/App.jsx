@@ -22,6 +22,9 @@
 //         <Route element={<PrivateRoute/>}>
 //           <Route path='/dashboard' element={<Dashboard/>}/>
 //         </Route>
+//         <Route element={<OnlyAdminPrivateRoute/>}>
+//           <Route path='/create-post' element={<CreatePost/>}/>
+//         </Route>
 //         <Route path='/projects' element={<Projects/>}/>
 //         <Route path='/home' element={<Home/>}/>
 //       </Routes>
@@ -39,6 +42,7 @@ import Projects from './pages/Projects'
 import Home from './pages/Home'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import CreatePost from './pages/CreatePost'
 // import PrivateRoute from './components/PrivateRoute'
 
 export default function App() {
@@ -51,6 +55,7 @@ export default function App() {
         <Route path='/Sign-in' element={<Signin/>}/>
         <Route path='/Sign-up' element={<SignUp/>}/>
         <Route path='/dashboard' element={<Dashboard/>}/>
+        <Route path='/create-post' element={<CreatePost/>}/>
         <Route path='/projects' element={<Projects/>}/>
         <Route path='/home' element={<Home/>}/>
       </Routes>

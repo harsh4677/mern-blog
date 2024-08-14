@@ -1,27 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import {
-  updateStart,
-  updateSuccess,
-  updateFailure,
-  deleteUserStart,
-  deleteUserSuccess,
-  deleteUserFailure,
-  signoutSuccess,
+import { 
+  updateStart, 
+  updateSuccess, 
+  updateFailure, 
+  deleteUserStart, 
+  deleteUserSuccess, 
+  deleteUserFailure, 
+  signoutSuccess 
 } from '../redux/user/userSlice';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 
 export default function DashProfile() {
-  const { currentUser, error } = useSelector((state) => state.user);
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -59,8 +55,7 @@ export default function DashProfile() {
     uploadTask.on(
       'state_changed',
       (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setImageFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
@@ -88,6 +83,7 @@ export default function DashProfile() {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
+
     if (Object.keys(formData).length === 0) {
       setUpdateUserError('No changes made');
       return;
@@ -96,6 +92,7 @@ export default function DashProfile() {
       setUpdateUserError('Please wait for image to upload');
       return;
     }
+
     try {
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -154,9 +151,9 @@ export default function DashProfile() {
   };
 
   return (
-    <div className='max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg'>
-      <h1 className='text-3xl font-semibold text-gray-800 mb-6 text-center'>Profile</h1>
-      <form onSubmit={handleSubmit} className='space-y-6'>
+    <div className='max-w-lg mx-auto p-6 w-full bg-white rounded-lg shadow-lg'>
+      <h1 className='my-7 text-center font-bold text-3xl text-gray-800'>Profile</h1>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
         <input
           type='file'
           accept='image/*'
@@ -165,116 +162,139 @@ export default function DashProfile() {
           hidden
         />
         <div
-          className='relative w-40 h-40 mx-auto cursor-pointer border-4 border-gray-300 rounded-full shadow-md overflow-hidden'
+          className='relative w-40 h-40 self-center cursor-pointer shadow-lg overflow-hidden rounded-full border-4 border-gray-300 bg-gray-100'
           onClick={() => filePickerRef.current.click()}
         >
-          {imageFileUploadProgress !== null && (
-            <div className='absolute inset-0 flex items-center justify-center'>
-              <CircularProgressbar
-                value={imageFileUploadProgress || 0}
-                text={`${imageFileUploadProgress}%`}
-                strokeWidth={6}
-                styles={{
-                  root: {
-                    width: '100%',
-                    height: '100%',
-                    position: 'absolute',
-                  },
-                  path: {
-                    stroke: `rgba(62, 152, 199, ${imageFileUploadProgress / 100})`,
-                  },
-                }}
-              />
-            </div>
+          {imageFileUploadProgress && (
+            <CircularProgressbar
+              value={imageFileUploadProgress || 0}
+              text={`${imageFileUploadProgress}%`}
+              strokeWidth={6}
+              styles={{
+                root: {
+                  width: '100%',
+                  height: '100%',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                },
+                path: {
+                  stroke: `rgba(62, 152, 199, ${imageFileUploadProgress / 100})`,
+                },
+                text: {
+                  fill: '#ffffff',
+                  fontSize: '20px',
+                },
+              }}
+            />
           )}
           <img
             src={imageFileUrl || currentUser.profilePicture}
             alt='user'
-            className={`w-full h-full object-cover rounded-full ${
-              imageFileUploadProgress && imageFileUploadProgress < 100 ? 'opacity-60' : ''
+            className={`rounded-full w-full h-full object-cover ${
+              imageFileUploadProgress && imageFileUploadProgress < 100
+                ? 'opacity-60'
+                : ''
             }`}
           />
         </div>
         {imageFileUploadError && (
-          <div className='bg-red-100 text-red-800 p-3 rounded'>
+          <div className='bg-red-200 text-red-800 border border-red-400 rounded-md p-3'>
             {imageFileUploadError}
           </div>
         )}
-        <div className='space-y-4'>
-          <input
-            type='text'
-            id='username'
-            placeholder='Username'
-            defaultValue={currentUser.username}
-            onChange={handleChange}
-            className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-          <input
-            type='email'
-            id='email'
-            placeholder='Email'
-            defaultValue={currentUser.email}
-            onChange={handleChange}
-            className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-          <input
-            type='password'
-            id='password'
-            placeholder='Password'
-            onChange={handleChange}
-            className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-        </div>
+        <input
+          type='text'
+          id='username'
+          placeholder='Username'
+          defaultValue={currentUser.username}
+          onChange={handleChange}
+          className='border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
+        />
+        <input
+          type='email'
+          id='email'
+          placeholder='Email'
+          defaultValue={currentUser.email}
+          onChange={handleChange}
+          className='border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
+        />
+        <input
+          type='password'
+          id='password'
+          placeholder='Password'
+          onChange={handleChange}
+          className='border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
+        />
         <button
           type='submit'
-          className='w-full py-3 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-md shadow-lg hover:bg-gradient-to-l transition duration-300'
+          className='bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-md shadow-md hover:from-purple-700 hover:to-blue-700 transition duration-300'
+          disabled={loading || imageFileUploading}
         >
-          Update Profile
+          {loading ? 'Loading...' : 'Update'}
         </button>
+        {currentUser.isAdmin && (
+          <Link to={'/create-post'}>
+            <button
+              type='button'
+              className='bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-md shadow-md hover:from-purple-700 hover:to-pink-700 transition duration-300 w-full'
+            >
+              Create a Post
+            </button>
+          </Link>
+        )}
       </form>
-      <div className='mt-6 flex justify-between text-gray-700'>
-        <button onClick={() => setShowModal(true)} className='hover:text-red-500 transition duration-300'>
+      <div className='text-red-600 flex justify-between mt-5'>
+        <span
+          onClick={() => setShowModal(true)}
+          className='cursor-pointer hover:underline'
+        >
           Delete Account
-        </button>
-        <button onClick={handleSignout} className='hover:text-blue-500 transition duration-300'>
+        </span>
+        <span
+          onClick={handleSignout}
+          className='cursor-pointer hover:underline'
+        >
           Sign Out
-        </button>
+        </span>
       </div>
       {updateUserSuccess && (
-        <div className='bg-green-100 text-green-800 p-4 rounded mt-4'>
+        <div className='bg-green-100 text-green-700 border border-green-300 rounded-md p-3 mt-5'>
           {updateUserSuccess}
         </div>
       )}
       {updateUserError && (
-        <div className='bg-red-100 text-red-800 p-4 rounded mt-4'>
+        <div className='bg-red-100 text-red-700 border border-red-300 rounded-md p-3 mt-5'>
           {updateUserError}
         </div>
       )}
       {error && (
-        <div className='bg-red-100 text-red-800 p-4 rounded mt-4'>
+        <div className='bg-red-100 text-red-700 border border-red-300 rounded-md p-3 mt-5'>
           {error}
         </div>
       )}
       {showModal && (
-        <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
-          <div className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full'>
-            <HiOutlineExclamationCircle className='h-12 w-12 text-gray-400 mx-auto mb-4' />
-            <h3 className='text-lg text-gray-700 mb-4 text-center'>
-              Are you sure you want to delete your account?
-            </h3>
-            <div className='flex justify-center gap-4'>
-              <button
-                onClick={handleDeleteUser}
-                className='py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300'
-              >
-                Yes, delete
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className='py-2 px-4 bg-gray-300 rounded-md hover:bg-gray-400 transition duration-300'
-              >
-                Cancel
-              </button>
+        <div className='fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50'>
+          <div className='bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto'>
+            <div className='text-center'>
+              <HiOutlineExclamationCircle className='h-16 w-16 text-gray-500 mb-4 mx-auto' />
+              <h3 className='mb-5 text-lg text-gray-700'>
+                Are you sure you want to delete your account?
+              </h3>
+              <div className='flex justify-center gap-4'>
+                <button
+                  className='bg-red-600 text-white px-5 py-3 rounded-md shadow-md hover:bg-red-700 transition duration-300'
+                  onClick={handleDeleteUser}
+                >
+                  Yes, I'm sure
+                </button>
+                <button
+                  className='bg-gray-300 text-gray-800 px-5 py-3 rounded-md shadow-md hover:bg-gray-400 transition duration-300'
+                  onClick={() => setShowModal(false)}
+                >
+                  No, cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
