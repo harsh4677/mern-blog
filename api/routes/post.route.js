@@ -1,11 +1,10 @@
-import express from 'express';
-import { verifyToken } from '../utils/verifyUser.js';
-import { create } from '../controllers/post.controller.js';
+const express = require('express');
+const { verifyToken } = require('../utils/verifyUser.js');
+const { create, getposts } = require('../controllers/post.controller.js');
 
 const router = express.Router();
 
-router.post('/create', verifyToken, create)
-router.get('/getposts', getposts)
+router.post('/create', verifyToken, create);
+router.get('/getposts', getposts);
 
-
-export default router;
+module.exports = router;
