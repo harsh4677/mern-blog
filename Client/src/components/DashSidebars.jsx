@@ -1,13 +1,13 @@
-import { HiUser, HiArrowSmRight } from 'react-icons/hi';
+import { HiUser, HiArrowSmRight, HiDocumentText } from 'react-icons/hi';
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function DashSidebar() {
   const location = useLocation();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
   const [tab, setTab] = useState('');
 
   useEffect(() => {
@@ -28,7 +28,6 @@ export default function DashSidebar() {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
-        navigate('/sign-in'); // Redirect after sign out
       }
     } catch (error) {
       console.log(error.message);
@@ -36,24 +35,47 @@ export default function DashSidebar() {
   };
 
   return (
-    <div className="w-full md:w-64 bg-gray-900 text-white h-full shadow-lg rounded-lg">
-      <div className="flex flex-col p-4 space-y-2">
-        <Link to="/dashboard?tab=profile">
+    <div className='w-full md:w-56 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg rounded-lg'>
+      <div className='p-4'>
+        <div className='flex flex-col gap-4'>
+          <Link to='/dashboard?tab=profile'>
+            <div
+              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                tab === 'profile'
+                  ? 'bg-white text-purple-700 shadow-md transform scale-105'
+                  : 'bg-indigo-600 hover:bg-indigo-700'
+              }`}
+            >
+              <HiUser className='w-5 h-5' />
+              <span>Profile</span>
+              {currentUser.isAdmin && (
+                <span className='ml-auto px-2 py-1 text-xs font-semibold text-white bg-purple-700 rounded-full'>
+                  Admin
+                </span>
+              )}
+            </div>
+          </Link>
+          {currentUser.isAdmin && (
+            <Link to='/dashboard?tab=posts'>
+              <div
+                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                  tab === 'posts'
+                    ? 'bg-white text-purple-700 shadow-md transform scale-105'
+                    : 'bg-indigo-600 hover:bg-indigo-700'
+                }`}
+              >
+                <HiDocumentText className='w-5 h-5' />
+                <span>Posts</span>
+              </div>
+            </Link>
+          )}
           <div
-            className={`flex items-center p-4 rounded-lg transition-all duration-300 transform hover:scale-105 ${
-              tab === 'profile' ? 'bg-cyan-900' : 'bg-gray-600'
-            }`}
+            className='flex items-center gap-3 p-3 rounded-lg cursor-pointer bg-red-600 hover:bg-red-700 transition-all duration-200'
+            onClick={handleSignout}
           >
-            <HiUser className="mr-3 text-3xl" />
-            <span className="text-xl font-semibold">Profile</span>
+            <HiArrowSmRight className='w-5 h-5' />
+            <span>Sign Out</span>
           </div>
-        </Link>
-        <div
-          className="flex items-center p-4 bg-red-900 rounded-lg cursor-pointer hover:bg-red-700 transition-all duration-300 transform hover:scale-105"
-          onClick={handleSignout}
-        >
-          <HiArrowSmRight className="mr-3 text-3xl" />
-          <span className="text-xl font-semibold">Sign Out</span>
         </div>
       </div>
     </div>
