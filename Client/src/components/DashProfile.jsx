@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   getDownloadURL,
   getStorage,
@@ -13,11 +13,15 @@ import {
   updateStart,
   updateSuccess,
   updateFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  signoutSuccess,
 } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 export default function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -25,6 +29,7 @@ export default function DashProfile() {
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
   const dispatch = useDispatch();
@@ -50,18 +55,16 @@ export default function DashProfile() {
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
     uploadTask.on(
       'state_changed',
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-
         setImageFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
-        setImageFileUploadError(
-          'Could not upload image (File must be less than 2MB)'
-        );
+        setImageFileUploadError('Could not upload image (File must be less than 2MB)');
         setImageFileUploadProgress(null);
         setImageFile(null);
         setImageFileUrl(null);
@@ -116,10 +119,44 @@ export default function DashProfile() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    setShowModal(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess(data));
+      }
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      const res = await fetch('/api/user/signout', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        dispatch(signoutSuccess());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
-    <div className='max-w-lg mx-auto p-3 w-full'>
-      <h1 className='my-7 text-center font-semibold text-3xl'>Profile</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+    <div className='max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg'>
+      <h1 className='text-3xl font-semibold text-gray-800 mb-6 text-center'>Profile</h1>
+      <form onSubmit={handleSubmit} className='space-y-6'>
         <input
           type='file'
           accept='image/*'
@@ -128,87 +165,118 @@ export default function DashProfile() {
           hidden
         />
         <div
-          className='relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full'
+          className='relative w-40 h-40 mx-auto cursor-pointer border-4 border-gray-300 rounded-full shadow-md overflow-hidden'
           onClick={() => filePickerRef.current.click()}
         >
-          {imageFileUploadProgress && (
-            <CircularProgressbar
-              value={imageFileUploadProgress || 0}
-              text={`${imageFileUploadProgress}%`}
-              strokeWidth={5}
-              styles={{
-                root: {
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                },
-                path: {
-                  stroke: `rgba(62, 152, 199, ${
-                    imageFileUploadProgress / 100
-                  })`,
-                },
-              }}
-            />
+          {imageFileUploadProgress !== null && (
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <CircularProgressbar
+                value={imageFileUploadProgress || 0}
+                text={`${imageFileUploadProgress}%`}
+                strokeWidth={6}
+                styles={{
+                  root: {
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                  },
+                  path: {
+                    stroke: `rgba(62, 152, 199, ${imageFileUploadProgress / 100})`,
+                  },
+                }}
+              />
+            </div>
           )}
           <img
             src={imageFileUrl || currentUser.profilePicture}
             alt='user'
-            className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
-              imageFileUploadProgress &&
-              imageFileUploadProgress < 100 &&
-              'opacity-60'
+            className={`w-full h-full object-cover rounded-full ${
+              imageFileUploadProgress && imageFileUploadProgress < 100 ? 'opacity-60' : ''
             }`}
           />
         </div>
         {imageFileUploadError && (
-          <div className="bg-red-100 text-red-700 px-4 py-3 rounded">
+          <div className='bg-red-100 text-red-800 p-3 rounded'>
             {imageFileUploadError}
           </div>
         )}
-        <input
-          type='text'
-          id='username'
-          placeholder='username'
-          defaultValue={currentUser.username}
-          onChange={handleChange}
-          className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600'
-        />
-        <input
-          type='email'
-          id='email'
-          placeholder='email'
-          defaultValue={currentUser.email}
-          onChange={handleChange}
-          className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600'
-        />
-        <input
-          type='password'
-          id='password'
-          placeholder='password'
-          onChange={handleChange}
-          className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600'
-        />
+        <div className='space-y-4'>
+          <input
+            type='text'
+            id='username'
+            placeholder='Username'
+            defaultValue={currentUser.username}
+            onChange={handleChange}
+            className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+          />
+          <input
+            type='email'
+            id='email'
+            placeholder='Email'
+            defaultValue={currentUser.email}
+            onChange={handleChange}
+            className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+          />
+          <input
+            type='password'
+            id='password'
+            placeholder='Password'
+            onChange={handleChange}
+            className='w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+          />
+        </div>
         <button
           type='submit'
-          className='px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-md focus:outline-none hover:bg-gradient-to-l'
+          className='w-full py-3 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-md shadow-lg hover:bg-gradient-to-l transition duration-300'
         >
-          Update
+          Update Profile
         </button>
       </form>
-      <div className='text-red-500 flex justify-between mt-5'>
-        <span className='cursor-pointer'>Delete Account</span>
-        <span className='cursor-pointer'>Sign Out</span>
+      <div className='mt-6 flex justify-between text-gray-700'>
+        <button onClick={() => setShowModal(true)} className='hover:text-red-500 transition duration-300'>
+          Delete Account
+        </button>
+        <button onClick={handleSignout} className='hover:text-blue-500 transition duration-300'>
+          Sign Out
+        </button>
       </div>
       {updateUserSuccess && (
-        <div className="bg-green-100 text-green-700 px-4 py-3 rounded mt-5">
+        <div className='bg-green-100 text-green-800 p-4 rounded mt-4'>
           {updateUserSuccess}
         </div>
       )}
       {updateUserError && (
-        <div className="bg-red-100 text-red-700 px-4 py-3 rounded mt-5">
+        <div className='bg-red-100 text-red-800 p-4 rounded mt-4'>
           {updateUserError}
+        </div>
+      )}
+      {error && (
+        <div className='bg-red-100 text-red-800 p-4 rounded mt-4'>
+          {error}
+        </div>
+      )}
+      {showModal && (
+        <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
+          <div className='bg-white p-6 rounded-lg shadow-lg max-w-sm w-full'>
+            <HiOutlineExclamationCircle className='h-12 w-12 text-gray-400 mx-auto mb-4' />
+            <h3 className='text-lg text-gray-700 mb-4 text-center'>
+              Are you sure you want to delete your account?
+            </h3>
+            <div className='flex justify-center gap-4'>
+              <button
+                onClick={handleDeleteUser}
+                className='py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300'
+              >
+                Yes, delete
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className='py-2 px-4 bg-gray-300 rounded-md hover:bg-gray-400 transition duration-300'
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
