@@ -1,17 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from 'firebase/storage';
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { 
-  updateStart, 
-  updateSuccess, 
-  updateFailure, 
-  deleteUserStart, 
-  deleteUserSuccess, 
-  deleteUserFailure, 
-  signoutSuccess 
+import {
+  updateStart,
+  updateSuccess,
+  updateFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  signoutSuccess,
 } from '../redux/user/userSlice';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -51,7 +56,6 @@ export default function DashProfile() {
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
     uploadTask.on(
       'state_changed',
       (snapshot) => {
@@ -83,7 +87,6 @@ export default function DashProfile() {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-
     if (Object.keys(formData).length === 0) {
       setUpdateUserError('No changes made');
       return;
@@ -92,7 +95,6 @@ export default function DashProfile() {
       setUpdateUserError('Please wait for image to upload');
       return;
     }
-
     try {
       dispatch(updateStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -151,9 +153,11 @@ export default function DashProfile() {
   };
 
   return (
-    <div className='max-w-lg mx-auto p-6 w-full bg-white rounded-lg shadow-lg'>
-      <h1 className='my-7 text-center font-bold text-3xl text-gray-800'>Profile</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
+    <div className='max-w-lg mx-auto p-5 w-full'>
+      <h1 className='my-7 text-center font-semibold text-4xl text-gray-800'>
+        Profile
+      </h1>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
         <input
           type='file'
           accept='image/*'
@@ -162,46 +166,43 @@ export default function DashProfile() {
           hidden
         />
         <div
-          className='relative w-40 h-40 self-center cursor-pointer shadow-lg overflow-hidden rounded-full border-4 border-gray-300 bg-gray-100'
+          className='relative w-36 h-36 self-center cursor-pointer shadow-lg overflow-hidden rounded-full border-4 border-gray-300 transition-transform duration-300 ease-in-out transform hover:scale-105'
           onClick={() => filePickerRef.current.click()}
         >
           {imageFileUploadProgress && (
-            <CircularProgressbar
-              value={imageFileUploadProgress || 0}
-              text={`${imageFileUploadProgress}%`}
-              strokeWidth={6}
-              styles={{
-                root: {
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                },
-                path: {
-                  stroke: `rgba(62, 152, 199, ${imageFileUploadProgress / 100})`,
-                },
-                text: {
-                  fill: '#ffffff',
-                  fontSize: '20px',
-                },
-              }}
-            />
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <CircularProgressbar
+                value={imageFileUploadProgress || 0}
+                text={`${imageFileUploadProgress}%`}
+                strokeWidth={8}
+                styles={{
+                  root: {
+                    width: '100%',
+                    height: '100%',
+                  },
+                  path: {
+                    stroke: `rgba(62, 152, 199, ${imageFileUploadProgress / 100})`,
+                  },
+                  text: {
+                    fill: '#ffffff',
+                    fontSize: '16px',
+                  },
+                }}
+              />
+            </div>
           )}
           <img
             src={imageFileUrl || currentUser.profilePicture}
             alt='user'
-            className={`rounded-full w-full h-full object-cover ${
-              imageFileUploadProgress && imageFileUploadProgress < 100
-                ? 'opacity-60'
-                : ''
+            className={`rounded-full w-full h-full object-cover border-4 border-gray-200 ${
+              imageFileUploadProgress &&
+              imageFileUploadProgress < 100 &&
+              'opacity-60'
             }`}
           />
         </div>
         {imageFileUploadError && (
-          <div className='bg-red-200 text-red-800 border border-red-400 rounded-md p-3'>
-            {imageFileUploadError}
-          </div>
+          <div className='text-red-500 mt-2 text-center'>{imageFileUploadError}</div>
         )}
         <input
           type='text'
@@ -209,7 +210,7 @@ export default function DashProfile() {
           placeholder='Username'
           defaultValue={currentUser.username}
           onChange={handleChange}
-          className='border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
+          className='border p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500'
         />
         <input
           type='email'
@@ -217,84 +218,79 @@ export default function DashProfile() {
           placeholder='Email'
           defaultValue={currentUser.email}
           onChange={handleChange}
-          className='border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
+          className='border p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500'
         />
         <input
           type='password'
           id='password'
           placeholder='Password'
           onChange={handleChange}
-          className='border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
+          className='border p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500'
         />
         <button
           type='submit'
-          className='bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-md shadow-md hover:from-purple-700 hover:to-blue-700 transition duration-300'
+          className={`p-3 rounded-lg transition-colors duration-300 ease-in-out ${loading || imageFileUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:bg-gradient-to-l hover:from-blue-500 hover:to-purple-500'}`}
           disabled={loading || imageFileUploading}
         >
           {loading ? 'Loading...' : 'Update'}
         </button>
         {currentUser.isAdmin && (
           <Link to={'/create-post'}>
-            <button
-              type='button'
-              className='bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-md shadow-md hover:from-purple-700 hover:to-pink-700 transition duration-300 w-full'
-            >
+            <button className='w-full p-3 mt-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-pink-500 hover:to-purple-500 transition-colors duration-300'>
               Create a Post
             </button>
           </Link>
         )}
       </form>
-      <div className='text-red-600 flex justify-between mt-5'>
+      <div className='text-red-500 flex justify-between mt-6'>
         <span
           onClick={() => setShowModal(true)}
-          className='cursor-pointer hover:underline'
+          className='cursor-pointer hover:text-red-700 transition-colors duration-300'
         >
           Delete Account
         </span>
         <span
           onClick={handleSignout}
-          className='cursor-pointer hover:underline'
+          className='cursor-pointer hover:text-blue-700 transition-colors duration-300'
         >
           Sign Out
         </span>
       </div>
       {updateUserSuccess && (
-        <div className='bg-green-100 text-green-700 border border-green-300 rounded-md p-3 mt-5'>
+        <div className='bg-green-100 text-green-800 p-4 rounded-lg shadow-md mt-5'>
           {updateUserSuccess}
         </div>
       )}
       {updateUserError && (
-        <div className='bg-red-100 text-red-700 border border-red-300 rounded-md p-3 mt-5'>
+        <div className='bg-red-100 text-red-800 p-4 rounded-lg shadow-md mt-5'>
           {updateUserError}
         </div>
       )}
       {error && (
-        <div className='bg-red-100 text-red-700 border border-red-300 rounded-md p-3 mt-5'>
+        <div className='bg-red-100 text-red-800 p-4 rounded-lg shadow-md mt-5'>
           {error}
         </div>
       )}
       {showModal && (
-        <div className='fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50'>
-          <div className='bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto'>
-            <div className='text-center'>
-              <HiOutlineExclamationCircle className='h-16 w-16 text-gray-500 mb-4 mx-auto' />
-              <h3 className='mb-5 text-lg text-gray-700'>
-                Are you sure you want to delete your account?
-              </h3>
-              <div className='flex justify-center gap-4'>
-                <button
-                  className='bg-red-600 text-white px-5 py-3 rounded-md shadow-md hover:bg-red-700 transition duration-300'
-                  onClick={handleDeleteUser}
-                >
-                  Yes, I'm sure
-                </button>
-                <button
-                  className='bg-gray-300 text-gray-800 px-5 py-3 rounded-md shadow-md hover:bg-gray-400 transition duration-300'
-                  onClick={() => setShowModal(false)}
-                >
-                  No, cancel
-                </button>
-              </div>
+        <div className='fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60'>
+          <div className='bg-white p-6 rounded-lg shadow-xl transform transition-all duration-300 scale-100'>
+            <HiOutlineExclamationCircle className='h-16 w-16 text-gray-400 mb-4 mx-auto' />
+            <h3 className='mb-5 text-xl font-semibold text-gray-800'>
+              Are you sure you want to delete your account?
+            </h3>
+            <div className='flex justify-center gap-5'>
+              <button
+                className='p-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300'
+                onClick={handleDeleteUser}
+              >
+                Yes, I'm sure
+              </button>
+              <button
+                className='p-3 bg-gray-300 text-gray-700 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300'
+                onClick={() => setShowModal(false)}
+              >
+                No, cancel
+              </button>
             </div>
           </div>
         </div>

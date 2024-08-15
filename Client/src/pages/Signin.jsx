@@ -1,76 +1,137 @@
-import * as React from 'react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from '../redux/user/userSlice';
 import OAuth from '../components/OAuth';
 
-function Signin({ setAuthState }) {
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [confirmPassword, setConfirmPassword] = React.useState('');
+export default function SignIn() {
+  const [formData, setFormData] = useState({});
+  const { loading, error: errorMessage } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    const handleSignup = () => {
-        // Add signup logic here if needed
-        console.log('Signup clicked');
-    };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
 
-    const handleGoogleSignup = () => {
-        // Add Google signup logic here if needed
-        console.log('Google Signup clicked');
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      return dispatch(signInFailure('Please fill all the fields'));
+    }
+    try {
+      dispatch(signInStart());
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signInFailure(data.message));
+      }
 
-    return (
-        <div className="flex w-full h-screen">
-            <div className="w-full flex items-center justify-center lg:w-1/2">
-                <div className='w-11/12 max-w-[700px] px-10 py-20 rounded-3xl bg-white border-2 border-gray-100'>
-                    <h1 className='text-5xl font-semibold'>Create an Account</h1>
-                    <p className='font-medium text-lg text-gray-500 mt-4'>Sign In to get started.</p>
-                    <div className='mt-8'>
-                        <div className='flex flex-col'>
-                            <label className='text-lg font-medium'>Email</label>
-                            <input 
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
-                                placeholder="Email"
-                            />
-                        </div>
-                        <div className='flex flex-col mt-4'>
-                            <label className='text-lg font-medium'>Password</label>
-                            <input 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
-                                placeholder="Password"
-                                type="password"
-                            />
-                        </div>
-                        <div className='mt-8 flex flex-col gap-y-4'>
-                            <button 
-                                onClick={handleSignup}
-                                className='active:scale-[.98] active:duration-75 transition-all hover:scale-[1.01] ease-in-out transform py-4 bg-violet-500 rounded-xl text-white font-bold text-lg'>
-                                Sign Up
-                            </button>
-                           <OAuth/>
-                        </div>
-                        <div className='mt-8 flex justify-center items-center'>
-                            <p className='font-medium text-base'>Already have an account?</p>
-                            <button 
-                                onClick={() => setAuthState('login')}
-                                className='ml-2 font-medium text-base text-violet-500'>
-                                Log In
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="hidden relative w-1/2 h-full lg:flex items-center justify-center bg-gray-200">
-                <div className="relative flex items-center justify-center w-60 h-60 rounded-full bg-gradient-to-tr from-violet-500 to-pink-500 animate-bounce">
-                    <span className="text-white text-9xl font-bold">B</span>
-                </div>
-                <div className="w-full h-1/2 absolute bottom-0 bg-white/10 backdrop-blur-lg" />
-            </div>
+      if (res.ok) {
+        dispatch(signInSuccess(data));
+        navigate('/');
+      }
+    } catch (error) {
+      dispatch(signInFailure(error.message));
+    }
+  };
+
+  return (
+    <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+      <div className='flex p-8 max-w-4xl mx-auto flex-col md:flex-row md:items-center gap-8 bg-white shadow-xl rounded-lg border border-gray-200'>
+        {/* Left */}
+        <div className='flex-1 text-center md:text-left'>
+          <Link to='/' className='font-bold text-5xl text-gray-900'>
+            <span className='px-4 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-full text-white'>
+              Sahand's
+            </span>
+            Blog
+          </Link>
+          <p className='text-base mt-4 text-gray-700'>
+            Welcome! Sign in with your email and password or use Google to access your account.
+          </p>
         </div>
-    );
+        {/* Right */}
+        <div className='flex-1'>
+          <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
+            <div className='flex flex-col'>
+              <label htmlFor='email' className='text-base font-medium text-gray-800'>
+                Email Address
+              </label>
+              <input
+                type='email'
+                placeholder='example@domain.com'
+                id='email'
+                onChange={handleChange}
+                className='mt-2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition duration-150 ease-in-out'
+              />
+            </div>
+            <div className='flex flex-col'>
+              <label htmlFor='password' className='text-base font-medium text-gray-800'>
+                Password
+              </label>
+              <input
+                type='password'
+                placeholder='••••••••••'
+                id='password'
+                onChange={handleChange}
+                className='mt-2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition duration-150 ease-in-out'
+              />
+            </div>
+            <button
+              type='submit'
+              disabled={loading}
+              className='w-full py-3 px-5 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold text-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition duration-150 ease-in-out'
+            >
+              {loading ? (
+                <div className='flex items-center justify-center'>
+                  <svg className='animate-spin h-6 w-6 text-white' viewBox='0 0 24 24'>
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                      fill='none'
+                    />
+                    <path
+                      className='opacity-75'
+                      fill='none'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                      d='M4 12a8 8 0 018-8v8H4z'
+                    />
+                  </svg>
+                  <span className='ml-3'>Loading...</span>
+                </div>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+            <OAuth />
+          </form>
+          <div className='flex gap-2 text-sm mt-6 justify-center md:justify-start'>
+            <span className='text-gray-600'>Don't have an account?</span>
+            <Link to='/sign-up' className='text-blue-500 hover:underline'>
+              Sign Up
+            </Link>
+          </div>
+          {errorMessage && (
+            <div className='mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg'>
+              {errorMessage}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default Signin;
-
-

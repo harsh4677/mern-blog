@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
   const [showMore, setShowMore] = useState(true);
-  console.log(userPosts);
+  const [showModal, setShowModal] = useState(false);
+  const [postIdToDelete, setPostIdToDelete] = useState('');
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -46,89 +49,128 @@ export default function DashPosts() {
     }
   };
 
+  const handleDeletePost = async () => {
+    setShowModal(false);
+    try {
+      const res = await fetch(
+        `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
-    <div className='p-6 mx-auto max-w-6xl overflow-x-auto'>
+    <div className='max-w-7xl mx-auto p-6'>
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
-          <table className='w-full min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow-lg'>
-            <thead className='bg-gray-100 dark:bg-gray-900'>
-              <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Date Updated
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Post Image
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Post Title
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Category
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Delete
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Edit
-                </th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-              {userPosts.map((post) => (
-                <tr key={post._id} className='hover:bg-gray-50 dark:hover:bg-gray-800'>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300'>
-                    {new Date(post.updatedAt).toLocaleDateString()}
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <Link to={`/post/${post.slug}`}>
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        className='w-24 h-12 object-cover rounded-md shadow-sm border border-gray-300'
-                      />
-                    </Link>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <Link
-                      className='text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300 font-semibold'
-                      to={`/post/${post.slug}`}
-                    >
-                      {post.title}
-                    </Link>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                    {post.category}
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 cursor-pointer'>
-                      Delete
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <Link
-                      className='text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300'
-                      to={`/update-post/${post._id}`}
-                    >
-                      Edit
-                    </Link>
-                  </td>
+          <div className='overflow-x-auto'>
+            <table className='min-w-full bg-white border border-gray-200 rounded-lg shadow-lg'>
+              <thead className='bg-gray-200'>
+                <tr>
+                  <th className='px-6 py-3 text-left text-gray-700 font-semibold'>Date Updated</th>
+                  <th className='px-6 py-3 text-left text-gray-700 font-semibold'>Post Image</th>
+                  <th className='px-6 py-3 text-left text-gray-700 font-semibold'>Post Title</th>
+                  <th className='px-6 py-3 text-left text-gray-700 font-semibold'>Category</th>
+                  <th className='px-6 py-3 text-left text-gray-700 font-semibold'>Delete</th>
+                  <th className='px-6 py-3 text-left text-gray-700 font-semibold'>Edit</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className='divide-y divide-gray-300'>
+                {userPosts.map((post) => (
+                  <tr key={post._id} className='bg-white hover:bg-gray-50'>
+                    <td className='px-6 py-4 text-gray-600'>{new Date(post.updatedAt).toLocaleDateString()}</td>
+                    <td className='px-6 py-4'>
+                      <Link to={`/post/${post.slug}`}>
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className='w-24 h-14 object-cover rounded-md shadow-sm border border-gray-200'
+                        />
+                      </Link>
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Link
+                        className='font-medium text-gray-900 hover:text-gray-700 transition-colors'
+                        to={`/post/${post.slug}`}
+                      >
+                        {post.title}
+                      </Link>
+                    </td>
+                    <td className='px-6 py-4 text-gray-600'>{post.category}</td>
+                    <td className='px-6 py-4'>
+                      <button
+                        onClick={() => {
+                          setShowModal(true);
+                          setPostIdToDelete(post._id);
+                        }}
+                        className='text-red-600 hover:text-red-800 transition-colors'
+                      >
+                        Delete
+                      </button>
+                    </td>
+                    <td className='px-6 py-4'>
+                      <Link
+                        className='text-teal-600 hover:text-teal-800 transition-colors'
+                        to={`/update-post/${post._id}`}
+                      >
+                        Edit
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {showMore && (
             <button
               onClick={handleShowMore}
-              className='mt-6 w-full px-4 py-2 text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300 font-semibold border border-teal-600 dark:border-teal-400 rounded-lg shadow-sm'
+              className='w-full text-teal-600 hover:text-teal-800 text-sm py-4 mt-6 border border-teal-300 rounded-md hover:bg-teal-100 transition-colors'
             >
-              Show More
+              Show more
             </button>
           )}
         </>
       ) : (
-        <p className='text-center text-gray-500 dark:text-gray-400'>
-          You have no posts yet!
-        </p>
+        <p className='text-center text-gray-500 mt-8'>You have no posts yet!</p>
+      )}
+
+      {showModal && (
+        <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50'>
+          <div className='bg-white rounded-lg p-8 shadow-xl max-w-md w-full'>
+            <div className='text-center'>
+              <HiOutlineExclamationCircle className='h-16 w-16 text-red-500 mb-4 mx-auto' />
+              <h3 className='mb-6 text-xl text-gray-800 font-semibold'>
+                Are you sure you want to delete this post?
+              </h3>
+              <div className='flex justify-center gap-6'>
+                <button
+                  onClick={handleDeletePost}
+                  className='py-2 px-6 bg-red-600 text-white rounded-md shadow-md hover:bg-red-700 transition-colors'
+                >
+                  <FaCheck className='inline mr-1' /> Yes, I'm sure
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className='py-2 px-6 border border-gray-300 text-gray-800 rounded-md shadow-md hover:bg-gray-100 transition-colors'
+                >
+                  <FaTimes className='inline mr-1' /> No, cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

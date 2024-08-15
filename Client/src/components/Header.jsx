@@ -1,20 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; 
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { FaMoon, FaSun } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
-import sun from "../assets/sun.svg";
-import moon from "../assets/moon.svg";
+import { toggleTheme } from '../redux/theme/themeSlice';
 import { signoutSuccess } from '../redux/user/userSlice';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { currentUser } = useSelector(state => state.user);
-  const dispatch = useDispatch();
+  const path = useLocation().pathname;
+  const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+  const { theme } = useSelector((state) => state.theme);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
-  );
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get('searchTerm');
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+  }, [location.search]);
 
   const handleSignout = async () => {
     try {
@@ -26,150 +33,92 @@ export default function Header() {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
-        navigate('/sign-in'); // Redirect after sign out
       }
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  // Update state on toggle
-  const handleToggle = (e) => {
-    setTheme(e.target.checked ? "dark" : "light");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('searchTerm', searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
   };
 
-  // Set theme state in localstorage on mount & also update localstorage on state change
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-    document.querySelector("html").setAttribute("data-theme", theme);
-  }, [theme]);
-
   return (
-    <div>
-      <header className="flex justify-between items-center text-black py-8 px-10 md:px-32 bg-white drop-shadow-md">
-        <Link to="/" className="px-2 py-1 bg-gradient-to-r">
-          <span className="px-5 py-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl text-white font-bold">
-            B
-          </span>
-          Spot
-        </Link>
-
-        <div className="relative hidden md:flex items-center justify-center gap-3">
-          <i className="bx bx-search absolute left-3 text-2xl text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="py-2 pl-10 rounded-xl border-2 border-blue-300 focus:bg-slate-100 focus:outline-sky-500"
-          />
-        </div>
-
-        <ul className="hidden xl:flex items-center gap-12 font-semibold text-base">
-          <li className="p-3 hover:bg-sky-400 hover:text-white rounded-md transition-all cursor-pointer">
-            <Link to="/">Home</Link>
-          </li>
-          <li className="p-3 hover:bg-sky-400 hover:text-white rounded-md transition-all cursor-pointer">
-            <Link to="/about">About</Link>
-          </li>
-          <li className="p-3 hover:bg-sky-400 hover:text-white rounded-md transition-all cursor-pointer">
-            <Link to="/projects">Projects</Link>
-          </li>
-        </ul>
-
-        <i
-          className="bx bx-menu xl:hidden block text-5xl cursor-pointer"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        ></i>
-
-        <div
-          className={`absolute xl:hidden top-24 left-0 w-full bg-white flex flex-col items-center gap-6 font-semibold text-lg transform ${
-            isMenuOpen ? 'opacity-100' : 'opacity-0 -translate-y-full'
-          }`}
-          style={{ transition: 'transform 0.3s ease, opacity 0.3s ease' }}
+    <header className='bg-gray-100 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-600 p-4 flex items-center justify-between shadow-md'>
+      <Link
+        to='/'
+        className='text-sm sm:text-xl font-semibold dark:text-white flex items-center space-x-2'
+      >
+        <span className='px-3 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white'>
+          Sahand's
+        </span>
+        <span className='text-gray-700 dark:text-gray-200'>Blog</span>
+      </Link>
+      <form onSubmit={handleSubmit} className='flex items-center space-x-2'>
+        <input
+          type='text'
+          placeholder='Search...'
+          className='hidden lg:inline p-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <button
+          type='submit'
+          className='lg:hidden p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition'
         >
-          <ul className="w-full">
-            <li className="list-none w-full">
-              <Link
-                to="/"
-                className="block text-center p-4 hover:bg-sky-400 hover:text-white transition-all cursor-pointer"
-              >
-                Home
-              </Link>
-            </li>
-            <li className="list-none w-full">
-              <Link
-                to="/about"
-                className="block text-center p-4 hover:bg-sky-400 hover:text-white transition-all cursor-pointer"
-              >
-                About
-              </Link>
-            </li>
-            <li className="list-none w-full">
-              <Link
-                to="/projects"
-                className="block text-center p-4 hover:bg-sky-400 hover:text-white transition-all cursor-pointer"
-              >
-                Projects
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div className="flex-none">
-          {/* Toggle button here */}
-          <button className="btn btn-square btn-ghost">
-            <label className="swap swap-rotate w-12 h-12">
-              <input
-                type="checkbox"
-                onChange={handleToggle}
-                checked={theme === "dark"}
-              />
-              <img src={sun} alt="light" className="w-8 h-8 swap-on" />
-              <img src={moon} alt="dark" className="w-8 h-8 swap-off" />
-            </label>
-          </button>
-        </div>
-
-        {/* User Dropdown Menu */}
+          <AiOutlineSearch className='text-gray-600 dark:text-gray-300' />
+        </button>
+      </form>
+      <div className='flex items-center space-x-2'>
+        <button
+          className='p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition'
+          onClick={() => dispatch(toggleTheme())}
+        >
+          {theme === 'light' ? <FaSun className='text-yellow-500' /> : <FaMoon className='text-gray-400' />}
+        </button>
         {currentUser ? (
-          <div className="relative">
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center"
-            >
+          <div className='relative'>
+            <button className='flex items-center p-1'>
               <img
                 src={currentUser.profilePicture}
-                alt="user"
-                className="w-10 h-10 rounded-full"
+                alt='user'
+                className='w-10 h-10 rounded-full border-2 border-gray-300 dark:border-gray-600'
               />
             </button>
-            <div
-              className={`absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 ${
-                dropdownOpen ? 'block' : 'hidden'
-              }`}
-            >
-              <div className="p-1">
-                <div className="px-4 py-2 text-sm text-gray-700">
-                  <span className='block text-sm'>@{currentUser.username}</span>
-                  <span className='block text-sm font-medium truncate'>{currentUser.email}</span>
+            <div className='absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg'>
+              <div className='p-3'>
+                <span className='block text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                  @{currentUser.username}
+                </span>
+                <span className='block text-sm text-gray-600 dark:text-gray-300'>
+                  {currentUser.email}
+                </span>
+              </div>
+              <Link to='/dashboard?tab=profile'>
+                <div className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition'>
+                  Profile
                 </div>
-                <Link to="/dashboard?tab=profile">
-                  <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Profile</a>
-                </Link>
-                <div className="border-t border-gray-200"></div>
-                <button onClick={handleSignout} className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                  Sign out
-                </button>
+              </Link>
+              <div
+                className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition'
+                onClick={handleSignout}
+              >
+                Sign out
               </div>
             </div>
           </div>
         ) : (
           <Link to='/sign-in'>
-            <button className="px-6 py-4 rounded-md bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold hover:from-purple-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all">
+            <button className='bg-gradient-to-r from-purple-500 to-blue-500 text-white p-2 rounded-lg shadow-md hover:from-purple-600 hover:to-blue-600 transition'>
               Sign In
             </button>
           </Link>
         )}
-      </header>
-    </div>
+      </div>
+    </header>
   );
 }

@@ -84,24 +84,21 @@ export default function CreatePost() {
   };
 
   return (
-    <div className='p-6 max-w-3xl mx-auto min-h-screen bg-gray-100 shadow-2xl rounded-2xl'>
-      <h1 className='text-center text-4xl my-8 font-bold text-purple-600'>
-        Create a Post
-      </h1>
-      <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
-        <div className='flex flex-col gap-6 sm:flex-row justify-between'>
+    <div className='p-8 max-w-4xl mx-auto min-h-screen bg-gray-100'>
+      <h1 className='text-center text-4xl my-8 font-bold text-gray-800'>Create a Post</h1>
+      <form className='bg-white shadow-lg rounded-lg p-6 space-y-6' onSubmit={handleSubmit}>
+        <div className='flex flex-col gap-6 sm:flex-row sm:items-center'>
           <input
             type='text'
             placeholder='Title'
             required
-            id='title'
-            className='flex-1 p-4 border-2 border-purple-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-500 transition-all duration-300'
+            className='flex-1 p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500'
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
           />
           <select
-            className='p-4 border-2 border-purple-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-500 transition-all duration-300'
+            className='p-4 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500'
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
@@ -112,30 +109,24 @@ export default function CreatePost() {
             <option value='nextjs'>Next.js</option>
           </select>
         </div>
-        <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-4 rounded-xl bg-teal-50'>
+        <div className='flex flex-col gap-4 sm:flex-row items-center'>
           <input
             type='file'
             accept='image/*'
             onChange={(e) => setFile(e.target.files[0])}
-            className='block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none'
+            className='p-4 border border-gray-300 rounded-md shadow-sm'
           />
           <button
             type='button'
-            className={`px-6 py-3 rounded-xl text-white bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-lg ${
-              imageUploadProgress ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className='bg-teal-500 text-white px-6 py-3 rounded-md shadow-md hover:bg-teal-600 transition duration-300 disabled:opacity-50 flex items-center justify-center'
             onClick={handleUploadImage}
             disabled={imageUploadProgress}
           >
             {imageUploadProgress ? (
-              <div className='w-20 h-20'>
+              <div className='w-16 h-16'>
                 <CircularProgressbar
                   value={imageUploadProgress}
                   text={`${imageUploadProgress || 0}%`}
-                  styles={{
-                    path: { stroke: `#6b46c1` },
-                    text: { fill: '#6b46c1', fontSize: '18px' },
-                  }}
                 />
               </div>
             ) : (
@@ -144,26 +135,21 @@ export default function CreatePost() {
           </button>
         </div>
         {imageUploadError && (
-          <div className='text-red-600 p-4 border border-red-600 rounded-lg bg-red-100'>
+          <div className='text-red-500 bg-red-100 p-4 rounded-md border border-red-300'>
             {imageUploadError}
           </div>
         )}
         {formData.image && (
-          <div className='relative'>
-            <img
-              src={formData.image}
-              alt='Uploaded'
-              className='w-full h-80 object-cover rounded-xl shadow-lg'
-            />
-            <span className='absolute top-3 left-3 bg-black text-white text-xs px-2 py-1 rounded'>
-              Uploaded Image
-            </span>
-          </div>
+          <img
+            src={formData.image}
+            alt='Uploaded'
+            className='w-full h-72 object-cover rounded-md shadow-md'
+          />
         )}
         <ReactQuill
           theme='snow'
-          placeholder='Write something amazing...'
-          className='h-80 mb-12 border-2 border-purple-300 rounded-xl'
+          placeholder='Write something...'
+          className='h-72 mb-6 border border-gray-300 rounded-md shadow-sm'
           required
           onChange={(value) => {
             setFormData({ ...formData, content: value });
@@ -171,12 +157,12 @@ export default function CreatePost() {
         />
         <button
           type='submit'
-          className='px-8 py-4 rounded-xl text-white bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-xl hover:shadow-2xl'
+          className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-md shadow-md hover:from-purple-600 hover:to-pink-600 transition duration-300'
         >
           Publish
         </button>
         {publishError && (
-          <div className='mt-5 text-red-600 p-4 border border-red-600 rounded-lg bg-red-100'>
+          <div className='text-red-500 bg-red-100 p-4 rounded-md border border-red-300 mt-5'>
             {publishError}
           </div>
         )}
