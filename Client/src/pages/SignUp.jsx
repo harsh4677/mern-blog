@@ -40,8 +40,8 @@ export default function SignUp() {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50'>
-      <div className='flex p-10 max-w-4xl mx-auto flex-col md:flex-row md:items-center gap-12 bg-white shadow-2xl rounded-lg border border-gray-300'>
+    <div className='min-h-screen flex items-center justify-center '>
+      <div className='flex p-10 max-w-4xl mx-auto flex-col md:flex-row md:items-center gap-12 bg-slate-100 shadow-2xl rounded-lg border border-gray-300'>
         {/* Left */}
         <div className='flex-1 text-center md:text-left'>
           <Link to='/' className='font-bold text-6xl text-gray-900'>

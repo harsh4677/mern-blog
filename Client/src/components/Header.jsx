@@ -48,38 +48,61 @@ export default function Header() {
   };
 
   return (
-    <header className='bg-gray-100 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-600 p-4 flex items-center justify-between shadow-md'>
+    <header className='bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-500
+     p-5
+    flex items-center justify-between shadow-xl transition-colors duration-300 ease-in-out'>
+
       <Link
         to='/'
         className='text-sm sm:text-xl font-semibold dark:text-white flex items-center space-x-2'
       >
-        <span className='px-3 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white'>
-          Sahand's
+        <span className='px-4 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl text-white'>
+          B
         </span>
-        <span className='text-gray-700 dark:text-gray-200'>Blog</span>
+        <span className='text-gray-700 dark:text-gray-200'>Spot</span>
       </Link>
-      <form onSubmit={handleSubmit} className='flex items-center space-x-2'>
-        <input
-          type='text'
-          placeholder='Search...'
-          className='hidden lg:inline p-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button
-          type='submit'
-          className='lg:hidden p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition'
-        >
-          <AiOutlineSearch className='text-gray-600 dark:text-gray-300' />
-        </button>
+
+      <form onSubmit={handleSubmit} className='flex items-center space-x-2 relative'>
+        <div className="relative flex items-center w-full">
+          <input
+            type='text'
+            placeholder='Search...'
+            className='pl-10 p-2 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 transition duration-150 ease-in-out'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <AiOutlineSearch className='absolute left-3 text-gray-600 dark:text-gray-300' />
+        </div>
       </form>
+
+        <nav className="bg-gray-800">
+          <div className="container mx-auto px-4 py-2">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-white">
+                <Link to="/" className={`px-3 py-2  font-semibold text-lg rounded ${path === '/' ? 'bg-gray-600' : ''}`}>Home</Link>
+                <Link to="/about" className={`px-3 py-2 font-semibold text-lg  rounded ${path === '/about' ? 'bg-gray-700' : ''}`}>About</Link>
+                <Link to="/projects" className={`px-3 py-2 font-semibold text-lg  rounded ${path === '/projects' ? 'bg-gray-700' : ''}`}>Projects</Link>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+
       <div className='flex items-center space-x-2'>
         <button
-          className='p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition'
+          className='px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-full
+          hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-150 ease-in-out'
           onClick={() => dispatch(toggleTheme())}
         >
-          {theme === 'light' ? <FaSun className='text-yellow-500' /> : <FaMoon className='text-gray-400' />}
+          {theme === 'light' ? (
+            <FaSun className='text-yellow-500' />
+          ) : (
+            <FaMoon className='text-gray-400' />
+          )}
         </button>
+
+
+
         {currentUser ? (
           <div className='relative'>
             <button className='flex items-center p-1'>
@@ -89,7 +112,9 @@ export default function Header() {
                 className='w-10 h-10 rounded-full border-2 border-gray-300 dark:border-gray-600'
               />
             </button>
-            <div className='absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg'>
+
+            <div className='absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border
+            border-gray-200 dark:border-gray-600 rounded-lg shadow-lg transition-transform transform hover:scale-105'>
               <div className='p-3'>
                 <span className='block text-sm font-semibold text-gray-900 dark:text-gray-100'>
                   @{currentUser.username}
@@ -99,12 +124,14 @@ export default function Header() {
                 </span>
               </div>
               <Link to='/dashboard?tab=profile'>
-                <div className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition'>
+                <div className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                cursor-pointer transition-colors duration-150 ease-in-out'>
                   Profile
                 </div>
               </Link>
               <div
-                className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition'
+                className='p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer 
+                transition-colors duration-150 ease-in-out'
                 onClick={handleSignout}
               >
                 Sign out
@@ -113,9 +140,12 @@ export default function Header() {
           </div>
         ) : (
           <Link to='/sign-in'>
-            <button className='bg-gradient-to-r from-purple-500 to-blue-500 text-white p-2 rounded-lg shadow-md hover:from-purple-600 hover:to-blue-600 transition'>
+            <button
+            type="button" 
+            className=" px-6 py-3 rounded-lg font-semibold text-lg bg-gradient-to-r
+             from-teal-600 to-slate-600 hover:from-pink-500 hover:to-orange-500 ...">
               Sign In
-            </button>
+          </button>
           </Link>
         )}
       </div>

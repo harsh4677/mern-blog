@@ -18,42 +18,85 @@ export default function SignIn() {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!formData.email || !formData.password) {
+  //     return dispatch(signInFailure('Please fill all the fields'));
+  //   }
+  //   try {
+  //     dispatch(signInStart());
+  //     const res = await fetch('/api/auth/signin', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify(formData),
+  //     });
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       dispatch(signInFailure(data.message));
+  //     }
+
+  //     if (res.ok) {
+  //       dispatch(signInSuccess(data));
+  //       navigate('/');
+  //     }
+  //   } catch (error) {
+  //     dispatch(signInFailure(error.message));
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check for missing fields
     if (!formData.email || !formData.password) {
       return dispatch(signInFailure('Please fill all the fields'));
     }
+  
     try {
       dispatch(signInStart());
+      
+      // Make the API request
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
+  
+      // Check if the response is OK
+      if (!res.ok) {
+        // Try to get the error message from the response
+        const errorData = await res.json();
+        dispatch(signInFailure(errorData.message || 'An unexpected error occurred'));
+        return;
+      }
+  
+      // Parse the JSON response
       const data = await res.json();
+      
+      // Check the data's success flag
       if (data.success === false) {
         dispatch(signInFailure(data.message));
-      }
-
-      if (res.ok) {
+      } else {
         dispatch(signInSuccess(data));
         navigate('/');
       }
+  
     } catch (error) {
-      dispatch(signInFailure(error.message));
+      dispatch(signInFailure('An error occurred: ' + error.message));
     }
   };
+  
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50'>
-      <div className='flex p-8 max-w-4xl mx-auto flex-col md:flex-row md:items-center gap-8 bg-white shadow-xl rounded-lg border border-gray-200'>
+    <div className='min-h-screen flex items-center justify-center  '>
+      <div className='flex p-8 max-w-4xl mx-auto flex-col md:flex-row md:items-center gap-8 bg-slate-100 shadow-xl rounded-lg border border-gray-200'>
         {/* Left */}
         <div className='flex-1 text-center md:text-left'>
           <Link to='/' className='font-bold text-5xl text-gray-900'>
             <span className='px-4 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-full text-white'>
-              Sahand's
+              B
             </span>
-            Blog
+              Spot
           </Link>
           <p className='text-base mt-4 text-gray-700'>
             Welcome! Sign in with your email and password or use Google to access your account.

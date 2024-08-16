@@ -18,5 +18,5 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// Export the function directly
 module.exports = verifyToken;
+

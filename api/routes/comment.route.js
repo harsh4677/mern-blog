@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyToken } = require('../utils/verifyUser.js');
+const verifyToken = require('../utils/verifyUser.js');
 const {
   createComment,
   deleteComment,

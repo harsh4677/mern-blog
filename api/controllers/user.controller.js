@@ -88,7 +88,10 @@ const signout = (req, res, next) => {
 };
 
 const getUsers = async (req, res, next) => {
-  if (!req.user.isAdmin) {
+  if (!req.user) {
+    return next(errorHandler(401, 'You are not authenticated'));
+  }
+  if(!req.user.isAdmin) {
     return next(errorHandler(403, 'You are not allowed to see all users'));
   }
   try {
@@ -142,13 +145,14 @@ const getUser = async (req, res, next) => {
   }
 };
 
+
 module.exports = {
-  test,
-  updateUser,
+  deleteUser,
   getUser,
   getUsers,
-  deleteUser,
   signout,
+  test,
+  updateUser,
 };
 
 

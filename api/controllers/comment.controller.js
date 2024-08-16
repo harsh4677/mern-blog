@@ -1,13 +1,11 @@
-const Comment = require('../models/comment.model.js')
+const Comment = require('../models/comment.model.js');
 
 const createComment = async (req, res, next) => {
   try {
     const { content, postId, userId } = req.body;
 
     if (userId !== req.user.id) {
-      return next(
-        errorHandler(403, 'You are not allowed to create this comment')
-      );
+      return next(errorHandler(403, 'You are not allowed to create this comment'));
     }
 
     const newComment = new Comment({
@@ -62,9 +60,7 @@ const editComment = async (req, res, next) => {
       return next(errorHandler(404, 'Comment not found'));
     }
     if (comment.userId !== req.user.id && !req.user.isAdmin) {
-      return next(
-        errorHandler(403, 'You are not allowed to edit this comment')
-      );
+      return next(errorHandler(403, 'You are not allowed to edit this comment'));
     }
 
     const editedComment = await Comment.findByIdAndUpdate(
@@ -87,9 +83,7 @@ const deleteComment = async (req, res, next) => {
       return next(errorHandler(404, 'Comment not found'));
     }
     if (comment.userId !== req.user.id && !req.user.isAdmin) {
-      return next(
-        errorHandler(403, 'You are not allowed to delete this comment')
-      );
+      return next(errorHandler(403, 'You are not allowed to delete this comment'));
     }
     await Comment.findByIdAndDelete(req.params.commentId);
     res.status(200).json('Comment has been deleted');
@@ -125,12 +119,12 @@ const getcomments = async (req, res, next) => {
   }
 };
 
-module.exports = {
-    createComment,
-    getPostComments,
-    likeComment,
-    editComment,
-    deleteComment,
-    getcomments,
 
+module.exports = {
+  createComment,
+  deleteComment,
+  editComment,
+  getPostComments,
+  getcomments,
+  likeComment,
 };

@@ -17,19 +17,22 @@ export default function Home() {
 
   return (
     <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
-      <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg shadow-lg'>
-        <h1 className='text-4xl font-extrabold lg:text-6xl'>Welcome to my Blog</h1>
-        <p className='text-gray-200 text-sm sm:text-base'>
-          Here you'll find a variety of articles and tutorials on topics such as
-          web development, software engineering, and programming languages.
-        </p>
+
+      <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto  text-white rounded-lg shadow-lg'>
+        <span className='text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent'>
+          Welcome To B-Spot
+        </span>
+        <h1 className='text-gray-120 text-lg'>
+          Here you'll find a variety of articles and tutorials on vaious topics.
+        </h1>
         <Link
           to='/search'
-          className='text-sm sm:text-base text-teal-200 font-semibold hover:underline'
+          className='text-lg sm:text-base text-teal-400 font-semibold hover:underline '
         >
           View all posts
         </Link>
       </div>
+
       <div className='p-3 bg-amber-200 dark:bg-slate-800'>
         <CallToAction />
       </div>

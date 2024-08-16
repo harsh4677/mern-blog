@@ -46,7 +46,7 @@ export default function FooterCom() {
               <ul className='mt-2 space-y-2'>
                 <li>
                   <a
-                    href='https://www.github.com/sahandghavidel'
+                    href='https://github.com/harsh4677'
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-gray-600 dark:text-gray-300 hover:underline'
@@ -90,26 +90,20 @@ export default function FooterCom() {
         <div className='mt-8 border-t border-gray-300 dark:border-gray-700 pt-4'>
           <div className='flex flex-col sm:flex-row justify-between items-center'>
             <span className='text-gray-600 dark:text-gray-300 text-sm'>
-              &copy; {new Date().getFullYear()} Sahand's Blog. All rights reserved.
+              &copy; {new Date().getFullYear()} B-Spot. All rights reserved.
             </span>
             <div className='flex mt-4 sm:mt-0 space-x-6'>
-              <a href='#' className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'>
-                <BsFacebook size={24} />
-              </a>
-              <a href='#' className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'>
+              <a href='https://www.instagram.com/ha_rsh4677/' className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'>
                 <BsInstagram size={24} />
               </a>
-              <a href='#' className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'>
+              <a href='https://x.com/HARSH01619' className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'>
                 <BsTwitter size={24} />
               </a>
               <a
-                href='https://github.com/sahandghavidel'
+                href='https://github.com/harsh4677'
                 className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
               >
                 <BsGithub size={24} />
-              </a>
-              <a href='#' className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'>
-                <BsDribbble size={24} />
               </a>
             </div>
           </div>
